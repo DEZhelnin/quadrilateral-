@@ -1,0 +1,364 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+
+
+
+namespace Quadrilateral
+{
+
+    internal class Points
+    {
+        public double x;
+        public double y;
+        public double z;
+
+
+        public double X { get; set; }
+        public double Y { get => y; set => y = value; }
+        public double Z { get => z; set => z = value; }
+        public Points(double x, double y, double z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+        public double distance(Points A, Points B)
+        {
+            return Math.Sqrt(((A.x - B.x) * (A.x - B.x)) + ((A.y - B.y) * (A.y - B.y)) + ((A.z - B.z) * (A.z - B.z)));
+        }
+
+        public double distance_to_zero_point(Points A)
+        {
+            return Math.Sqrt((A.x * A.x) + (A.y * A.y) + (A.z * A.z));
+        }
+
+        public void line(Points A, Points B)
+        {
+            double k1 = B.x - A.x;
+            double k2 = B.y - A.y;
+            double k3 = B.z - A.z;
+            if (k1 != 0 || k2 != 0 || k3 != 0)
+            {
+                if (k1 == 0 && k2 == 0)
+                {
+                    Console.WriteLine("x={0} y ={1} z-любое", A.x, A.y);
+                }
+                else if (k1 == 0 && k3 == 0)
+                {
+                    Console.WriteLine("x={0} z ={1} y-любое", A.x, A.z);
+                }
+                else if (k2 == 0 && k3 == 0)
+                {
+                    Console.WriteLine("y={0} z ={1} x-любое", A.y, A.z);
+                }
+                else if (k1 == 0)
+                {
+                    Console.Write("x={0} ", A.x);
+                    if (A.y > 0) Console.Write("y-{0}", A.y);
+                    else if (A.y == 0) Console.Write("y");
+                    else Console.Write("y+{0}", Math.Abs(A.y));
+                    Console.Write("/{0}=", k2);
+                    if (A.z > 0) Console.Write("z-{0}", A.z);
+                    else if (A.z == 0) Console.Write("z");
+                    else Console.Write("z+{0}", Math.Abs(A.z));
+                    Console.Write("/{0}", k3);
+                }
+                else if (k2 == 0)
+                {
+                    Console.Write("y={0} ", A.y);
+                    if (A.x > 0) Console.Write("x-{0}", A.x);
+                    else if (A.x == 0) Console.Write("x");
+                    else Console.Write("x+{0}", Math.Abs(A.x));
+                    Console.Write("/{0}=", k1);
+                    if (A.z > 0) Console.Write("z-{0}", A.z);
+                    else if (A.z == 0) Console.Write("z");
+                    else Console.Write("z+{0}", Math.Abs(A.z));
+                    Console.Write("/{0}", k3);
+                }
+                else if (k3 == 0)
+                {
+                    Console.Write("z={0} ", A.z);
+                    if (A.x > 0) Console.Write("x-{0}", A.x);
+                    else if (A.x == 0) Console.Write("x");
+                    else Console.Write("x+{0}", Math.Abs(A.x));
+                    Console.Write("/{0=}", k1);
+                    if (A.y > 0) Console.Write("y-{0}", A.y);
+                    else if (A.y == 0) Console.Write("y");
+                    else Console.Write("y+{0}", Math.Abs(A.y));
+                    Console.Write("/{0}", k2);
+                }
+            }
+            else { Console.WriteLine("ввели две одинаковые точки"); }
+            Console.WriteLine();
+
+        }
+        public void plane(Points A, Points B, Points C)
+        {
+            double a1 = B.x - A.x;
+            double a2 = B.y - A.y;
+            double a3 = B.z - A.z;
+            double b1 = C.x - A.x;
+            double b2 = C.y - A.y;
+            double b3 = C.z - A.z;
+            double a = (a2 * b3) - (b2 * a3);
+            double b = -((a1 * b3) - (b1 * a3));
+            double c = (a1 * b2) - (b1 * a2);
+            double d = -(A.x * a) - (A.y * b) - (A.z * c);
+            if (a == 0 && b == 0 && c == 0)
+            {
+                Console.WriteLine("точки лежат на одной прямой");
+            }
+            else
+            {
+                if (a != 0)
+                {
+                    Console.Write("{0}x", a);
+                }
+                if (b != 0)
+                {
+                    if (b > 0) Console.Write("+{0}y", b);
+                    else Console.Write("{0}y", b);
+                }
+                if (c != 0)
+                {
+                    if (c > 0) Console.Write("+{0}z", c);
+                    else Console.Write("{0}z", c);
+                }
+                if (d != 0)
+                {
+                    if (d > 0) Console.Write("+{0}=0", d);
+                    else Console.Write("{0}=0", d);
+                }
+                Console.WriteLine();
+
+            }
+        }
+
+        public bool are_parallel(Points A, Points B, Points C, Points D)
+        {
+            double x1 = B.x - A.x;
+            double y1 = B.y - A.y;
+            double z1 = B.z - A.z;
+            double x2 = C.x - D.x;
+            double y2 = C.y - D.y;
+            double z2 = C.z - D.z;
+            double x3 = C.x - A.x;
+            double y3 = C.y - A.y;
+            double z3 = C.z - A.z;
+
+            if (((y1 * z2) - (y2*z1) == (x1 * z2) - (x2 * z1)) && ((y1 * z2) - (y2 * z1) == (x1 * y2) - (y2 * x1)) && ((x1 * y2) - (y2 * x1)==0))
+            {
+                if (((y1 * z3) - (y3 * z1) == (x1 * z3) - (x3 * z1)) && ((y1 * z3) - (y3 * z1) == (x1 * y3) - (y3 * x1)) && ((x1 * y3) - (y3 * x1) == 0))
+
+                {
+                    Console.WriteLine("точки лежат на одной прямой");
+                    return false;
+                }
+                else return true;
+            }
+            else return false;
+        }
+        public double dot_product(Points A, Points B, Points C)
+        {
+            return (((B.x - A.x) * (B.x - C.x)) + ((B.y - A.y) * (B.y - C.y)) + ((B.z - A.z) * (B.z - C.z)));
+
+        }
+
+        public double dot_product(Points A, Points B, Points C, Points D)
+        {
+            return (((B.x - A.x) * (D.x - C.x)) + ((B.y - A.y) * (D.y - C.y)) + ((B.z - A.z) * (D.z - C.z)));
+
+        }
+
+        public bool relates_to_plane(Points A, Points B, Points C, Points D)
+        {
+            double a1 = B.x - A.x;
+            double a2 = B.y - A.y;
+            double a3 = B.z - A.z;
+            double b1 = C.x - A.x;
+            double b2 = C.y - A.y;
+            double b3 = C.z - A.z;
+            double a = (a2 * b3) - (b2 * a3);
+            double b = -((a1 * b3) - (b1 * a3));
+            double c = (a1 * b2) - (b1 * a2);
+            double d = -(A.x * a) - (A.y * b) - (A.z * c);
+            if (((D.x * a) + (D.y * b) + (D.z * c) + d) < 10 * double.Epsilon) return true;
+            else return false;
+        }
+
+        public Points cross_product(Points A, Points B, Points C)
+        {
+            Points D = new Points(B.x, B.y, B.z);
+            double a1 = A.x - B.x;
+            double a2 = A.y - B.y;
+            double a3 = A.z - B.z;
+            double b1 = C.x - B.x;
+            double b2 = C.y - B.y;
+            double b3 = C.z - B.z;
+            D.x += (a2 * b3) - (b2*a3);
+            D.y -= (a1 * b3) - (b1 * a3);
+            D.z += (a1 * b2) - (b2 * a1);
+            return D;
+        }
+
+    }
+
+        internal class Quadrilateral : Points
+        {
+            Points A1 { get; set; }
+            Points A2 { get; set; }
+            Points A3 { get; set; }
+            Points A4 { get; set; }
+
+            public Quadrilateral(Points A, Points B, Points C, Points D)
+               : base(A.x, A.y, A.z)
+            {
+
+                if (relates_to_plane(A, B, C, D) == true)
+                {
+                    this.A1 = A;
+                    this.A2 = B;
+                    this.A3 = C;
+                    this.A4 = D;
+                }
+                else
+                {
+                    Console.WriteLine("точки не лежат в одной плоскости");
+                    this.A1 = A;
+                    this.A2 = A;
+                    this.A3 = A;
+                    this.A4 = A;
+                }
+
+            }
+
+        public bool is_convex(Quadrilateral Q)
+        {
+            Points D = cross_product(A1, A2, A3);
+            Points D1 = cross_product(A2, A3, A4);
+            Points D2 = cross_product(A3, A4, A1);
+            Points D3 = cross_product(A4, A1, A2);
+            if ((dot_product(A2, D, A3, D1) > 0) && (dot_product(A3, D1, A4, D2) > 0) && (dot_product(A4, D2, A1, D3) > 0))
+            {
+                return true;
+            }
+            else return false;
+        }
+
+
+        public double area (Quadrilateral Q)
+        {
+            double area;
+            double angle1;
+            double angle2;
+            if (is_convex(Q))
+            {
+                angle1 = Math.Acos(dot_product(A1, A2, A3) / (distance(A1, A2) * distance(A2, A3)));
+                angle2 = Math.Acos(dot_product(A3, A4, A1) / (distance(A3, A4) * distance(A4, A1)));
+                area = (0.5 * distance(A1, A2) * distance(A2, A3) * Math.Sin(angle1)) + (0.5 * distance(A3, A4) * distance(A4, A1) * Math.Sin(angle2));
+            }
+            else
+            {
+               
+      
+               area = 0;
+            }
+            return area;
+        }
+            public double perimeter(Quadrilateral Q)
+            {
+                return (distance(A1, A2) + distance(A2, A3) + distance(A3, A4) + distance(A4, A1));
+            }
+
+            public double diagonal_1(Quadrilateral Q)
+            {
+                return distance(A1, A3);
+            }
+
+            public double diagonal_2(Quadrilateral Q)
+            {
+                return distance(A2, A4);
+            }
+
+        public bool is_square(Quadrilateral Q)
+        {
+            if (is_convex(Q))
+            {
+                if ((distance(A1, A2) == distance(A2, A3)) && (distance(A2, A3) == distance(A3, A4)) && (distance(A3, A4) == distance(A4, A1)) && (distance(A4, A1) != 0))
+                {
+                    if ((dot_product(A1, A2, A3) == dot_product(A2, A3, A4)) && (dot_product(A2, A3, A4) == dot_product(A3, A4, A1)) && (dot_product(A3, A4, A1) == 0))
+                    {
+                        return true;
+                    }
+                    else return false;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public bool is_rectangle(Quadrilateral Q)
+        {
+            if (is_convex(Q))
+            {
+                if ((distance(A1, A2) == distance(A3, A4)) && (distance(A2, A3) == distance(A1, A4)) && (distance(A4, A1) != 0) && (distance(A2, A1) != 0))
+                {
+                    if ((dot_product(A1, A2, A3) == dot_product(A2, A3, A4)) && (dot_product(A2, A3, A4) == dot_product(A3, A4, A1)) && (dot_product(A3, A4, A1) == 0))
+                    {
+                        return true;
+                    }
+                    else return false;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public bool is_trapezium(Quadrilateral Q)
+        {
+            if (is_convex(Q))
+            {
+                if (((are_parallel(A1, A2, A3, A4) == true) && (are_parallel(A2, A3, A4, A1) == false)) || ((are_parallel(A1, A2, A3, A4) == false) && (are_parallel(A2, A3, A4, A1) == true)))
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public bool is_parallelogram(Quadrilateral Q)
+        {
+            if (is_convex(Q))
+            {
+                if ((are_parallel(A1, A2, A3, A4) == true) && (are_parallel(A2, A3, A4, A1) == true) && (distance(A1, A2) == distance(A3, A4)) && (distance(A2, A3) == distance(A4, A1)) && (distance(A4, A1) != 0) && (distance(A2, A1) != 0))
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public bool is_rhombus(Quadrilateral Q)
+        {
+            if (is_convex(Q))
+            {
+                if ((are_parallel(A1, A2, A3, A4) == true) && (are_parallel(A2, A3, A4, A1) == true) && (distance(A1, A2) == distance(A3, A4)) && (distance(A2, A3) == distance(A4, A1)) && (distance(A4, A1) == distance(A2, A1)) && (distance(A4, A1) != 0))
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+        }
+}
