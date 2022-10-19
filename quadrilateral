@@ -360,5 +360,73 @@ namespace Quadrilateral
             }
             else return false;
         }
+
+        public double min_x(Quadrilateral Q)
+        {
+            return Math.Min(Math.Min(A1.x, A2.x), Math.Min(A3.x, A4.x));
+
+        }
+
+        public double min_y(Quadrilateral Q)
+        {
+            return Math.Min(Math.Min(A1.y, A2.y), Math.Min(A3.y, A4.y));
+
+        }
+
+        public double min_z(Quadrilateral Q)
+        {
+            return Math.Min(Math.Min(A1.z, A2.z), Math.Min(A3.z, A4.z));
+
+        }
+
+        public double max_x(Quadrilateral Q)
+        {
+            return Math.Max(Math.Max(A1.x, A2.x), Math.Max(A3.x, A4.x));
+
+        }
+        public double max_y(Quadrilateral Q)
+        {
+            return Math.Max(Math.Max(A1.y, A2.y), Math.Max(A3.y, A4.y));
+
+        }
+        public double max_z(Quadrilateral Q)
+        {
+            return Math.Max(Math.Max(A1.z, A2.z), Math.Max(A3.z, A4.z));
+
+        }
+
+        public bool exist_crossing(Quadrilateral Q1, Quadrilateral Q2)
+        {
+            if (relates_to_plane(Q1.A1,Q1.A2,Q1.A3,Q2.A1)&& relates_to_plane(Q1.A1, Q1.A2, Q1.A3, Q2.A2)&& relates_to_plane(Q1.A1, Q1.A2, Q1.A3, Q2.A3)) {
+                int k = 0;
+                if ((min_x(Q1) <= Q2.A1.x) && (Q2.A1.x <= max_x(Q1)) && (min_y(Q1) <= Q2.A1.y) && (Q2.A1.y <= max_y(Q1)) && (min_z(Q1) <= Q2.A1.z) && (Q2.A1.z <= max_z(Q1))) k++;
+                if ((min_x(Q1) <= Q2.A2.x) && (Q2.A2.x <= max_x(Q1)) && (min_y(Q1) <= Q2.A2.y) && (Q2.A2.y <= max_y(Q1)) && (min_z(Q1) <= Q2.A2.z) && (Q2.A2.z <= max_z(Q1))) k++;
+                if ((min_x(Q1) <= Q2.A3.x) && (Q2.A3.x <= max_x(Q1)) && (min_y(Q1) <= Q2.A3.y) && (Q2.A3.y <= max_y(Q1)) && (min_z(Q1) <= Q2.A3.z) && (Q2.A3.z <= max_z(Q1))) k++;
+                if ((min_x(Q1) <= Q2.A4.x) && (Q2.A4.x <= max_x(Q1)) && (min_y(Q1) <= Q2.A4.y) && (Q2.A4.y <= max_y(Q1)) && (min_z(Q1) <= Q2.A4.z) && (Q2.A4.z <= max_z(Q1))) k++;
+                if (k == 0 || k == 4)
+                {
+                    return false;
+                }
+                else return true;
+            }
+            else return false;
+        }
+
+
+        public bool is_inside( Quadrilateral Q1, Quadrilateral Q2)
+        {
+            if (is_convex(Q1) && !(exist_crossing(Q1,Q2)))
+            {
+                if (area(Q1) >= area(Q2))
+                {
+                    if ((min_x(Q1) <= min_x(Q2)) && (max_x(Q1) >= max_x(Q2)) && (min_y(Q1) <= min_y(Q2)) && (min_z(Q1) <= min_z(Q2)) && (max_y(Q1) >= max_y(Q2)) && (max_z(Q1) >= max_z(Q2)))
+                    { return true; }
+                    else return false;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
         }
 }
